@@ -1,0 +1,42 @@
+<script>
+function convertirEnBinaire(n) {
+    // Partie entere
+    const partieEntiere = Math.floor(n);
+    // Partie decimale
+    let partieDecimale = n - partieEntiere;
+
+    // Conversion de la partie entiere
+    let binaireEntier = partieEntiere.toString(2);
+
+    // Conversion de la partie decimale en utilisant la table des puissances de 2
+    let pile = [];
+    let binaireDecimale = '.';
+
+    // On repete le processus jusqu'à ce que la partie décimale devienne 0
+    while (partieDecimale > 0) {
+        partieDecimale *= 2;
+        if (partieDecimale >= 1) {
+            pile.push(1); // On empile un 1 si la valeur est superieure ou égale à 1
+            partieDecimale -= 1; // On soustrait 1 du résultat
+        } else {
+            pile.push(0); // On empile un 0 si la valeur est infrieure à 1
+        }
+        
+        if (pile.length > 50) break; // verifier pour les grandes iterations pour voir ce que ca donne
+    }
+
+    // Ajout des bits de la partie décimale
+    
+    binaireDecimale += pile.join('');
+    console.log(`decimal en binaire : ${binaireDecimale}`)
+
+    return binaireEntier + binaireDecimale;
+}
+
+// Exemple d'utilisation
+const nombre = 2.999999999999999;
+console.log(`Le nombre ${nombre} en binaire est : ${convertirEnBinaire(nombre)}`);
+/* limite actuelle : après 15 chiffres apres la virgule, javascript arrondit à la valeur supérieure nombre
+ l'utilisation de Math.floor pour definit la partie entiere d'un reel negaritm arrondit à la valeur inferieur un nombre à virgule Math.floor(-5.05) = 6
+ utiliser la library decimal.js pour voir ce que ca donne 
+</script>
