@@ -1,0 +1,61 @@
+<script>
+
+    function convertir_en_binaire(nombre) {
+    
+        const [entier_string, decimal_string] = nombre.toString().split('.');
+        const binaire_entier = entier_en_binaire(parseInt(entier_string, 10));
+        const binaire_decimale= decimal_en_binaire(decimal_string);
+        return {
+            binaire: `${binaire_entier}.${binaire_decimale}`
+            };
+    }
+    
+    function decimal_en_binaire(decimal_string) {
+        const puissances_negatives2 = [];
+        for (let i = 1; i <= 64; i++) {
+            puissances_negatives2.push(Math.pow(2, -i));
+        }
+    
+        let partieDecimale = decimal_string ? parseFloat(`0.${decimal_string}`) : 0;
+        let binaire_decimale = '';
+    
+        for (const puissance of puissances_negatives2) {
+            if (partieDecimale >= puissance) {
+                binaire_decimale += '1';
+                partieDecimale -= puissance;
+            } else {
+                binaire_decimale += '0';
+            }
+        }
+    
+        return binaire_decimale;
+    }
+    
+    function entier_en_binaire(n) {
+        const puissancesDe2 = [];
+    
+        for (let i = 0; i < 63; i++) {
+            puissancesDe2.push(Math.pow(2, i));
+        }
+        const binaire = [];
+        for (let i = 62; i >= 0; i--) {
+            if (n >= puissancesDe2[i]) {
+                binaire.push(1);
+                n -= puissancesDe2[i];
+            } else {
+                binaire.push(0);
+            }
+        }
+        return binaire.join('');
+    }
+    
+    const nombre = 14.123456789;
+    const result1 = convertir_en_binaire(nombre);
+    console.log(`Le nombre ${nombre} en binaire (64 bits decimaux) est : ${result1.binaire}`);
+    console.log("Tableau des puissances negatives de 2 :", result1.puissances_negatives2);
+    const grandNombre = 0.987654321;
+    const result2 = convertir_en_binaire(grandNombre);
+    console.log(`Le nombre ${grandNombre} en binaire (64 bits decimaux) est : ${result2.binaire}`);
+    console.log("Tableau des puissances negatives de 2 :", result2.puissances_negatives2);
+    
+    </script>
