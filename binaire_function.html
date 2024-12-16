@@ -72,21 +72,18 @@
         const dec2Align = dec2.padEnd(maxLongueurDecimales, '0');
 
         // soustraire les parties entière et décimale
-        const { resultat: resultatEntiers, retenue } = soustraction_binaire_alignee(entier1Align, entier2Align);
-        const { resultat: resultatDecimales }= soustraction_binaire_alignee(dec1Align, dec2Align, true);
+        const { resultat: resultatDecimales, retenue: retenueDecimale }= soustraction_binaire_alignee(dec1Align, dec2Align, true);
 
-        // ajustement de la partie entière si affectée par la retenue
-        const resultatFinalEntiers = retenue === 1
-            ? soustraction_binaire_alignee(resultatEntiers, '1'.padStart(resultatEntiers.length, '0')).resultat
-            : resultatEntiers;
+        // soustratcion de la partie entière avec retenue si besoin
+        const { resultat: resultatEntiers } = retenueDecimale === 1
+            ? soustraction_binaire_alignee(entier1Align, ajouter_retenue(entier2Align))
+            : soustraction_binaire_alignee(entier1Align, entier2Align);
 
         // combiner les parties entière et décimale
-        const resultatBinaire = `${resultatFinalEntiers}.${resultatDecimales}`;
-        console.log(resultatBinaire);
+        const resultatBinaire = `${resultatEntiers}.${resultatDecimales}`;
 
         // convertir le résultat binaire en décimal
         const resultatDecimal = convertir_binaire_en_decimal(resultatBinaire);
-        console.log(resultatDecimal);
 
         // vérification de la cohérence
         const verifDecimal = nombre1 - nombre2;
@@ -104,14 +101,11 @@
         };
     }
 
-    // fonction qui fait la soustraction
+    // fonction qui fait la soustraction  de 2 chaines binaires alignées
     function soustraction_binaire_alignee(binaire1, binaire2, isDecimal = false) {
         let retenue = 0;
         const resultat = [];
         const longueur = binaire1.length;
-        console.log(binaire1);
-        console.log(binaire2);
-        console.log(binaire1.length);
 
         for (let i = longueur - 1; i>=0; i--) {
             const bit1 = parseInt(binaire1[i] || '0', 10);
@@ -139,6 +133,26 @@
         return { resultat: resultatStr, retenue };
     }
 
+    // ajout d'une retenue à une chaine binaire
+    function ajouter_retenue(binaire) {
+        const longueur = binaire.length;
+        let resultat = [];
+        let retenue = 1;
+
+        for (let i = longueur - 1; i >= 0; i--) {
+            const bit = parseInt(binaire[i], 10) + retenue;
+            if (bit === 2) {
+                resultat.unshift(0);
+                retenue = 1;
+            } else {
+                resultat.unshift(bit);
+                retenue = 0;
+            }
+        }
+
+        return resultat.join('');
+    }
+
     // Fonction pour convertir un nombre binaire (sous forme "entier.décimal") en décimal
     function convertir_binaire_en_decimal(binaire) {
         const [entier, decimale = ""] = binaire.split('.');
@@ -158,6 +172,7 @@
 
     const resultat = soustraction_binaire(nombre1, nombre2);
     console.log("Résultat final :", resultat);
+
     console.log("Résultat attendu : ", nombre1-nombre2);
 
 
