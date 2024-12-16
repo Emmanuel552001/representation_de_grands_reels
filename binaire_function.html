@@ -49,6 +49,61 @@
         return binaire.join('');
     }
     
+    // fonction pour soustraire 2 chaines binaires alignées
+    function soustraction_binaire(binaire1, binaire2, isDecimal = false) {
+        let retenue = 0;
+        const resultat = [];
+        const bin1 = convertir_en_binaire(binaire1);
+        const bin2 = convertir_en_binaire(binaire2);
+        const longueur = bin1.length;
+        console.log(binaire1);
+        console.log(bin1.binaire);
+        console.log(binaire2);
+        console.log(bin2.binaire);
+
+        for (let i = longueur - 1; i>=0; i--) {
+            const bit1 = parseInt(bin1[i], 10);
+            const bit2 = parseInt(bin2[i], 10);
+
+            let diff = bit1 - bit2 - retenue;
+            if (diff < 0) {
+                diff += 2; // gestion de la retenue
+                retenue = 1;
+            } else {
+                retenue = 0;
+            }
+
+            resultat.unshift(diff); // ajoute le bit au début
+        }
+
+        // Si c'est la partie entière, on peut omettre les zéros en tête
+       // return isDecimal ? resultat.join('') : resultat.join('').replace(/^0+/, '') || '0';
+       return resultat;
+    }
+
+    // Fonction pour convertir un nombre binaire (sous forme "entier.décimal") en décimal
+    function convertir_binaire_en_decimal(binaire) {
+        const [entier, decimale = ""] = binaire.split('.');
+        const entierDecimal = parseInt(entier, 2);
+        let decimalDecimal = 0;
+
+        for (let i = 0; i < decimale.length; i++) {
+            decimalDecimal += parseInt(decimale[i], 10) * Math.pow(2, -(i + 1));
+        }
+
+        return entierDecimal + decimalDecimal;
+    }
+
+    // Exemple d'utilisation
+    const nombre1 = 12.625;
+    const nombre2 = 10.75;
+
+    const resultat = soustraction_binaire(nombre1, nombre2);
+    console.log("Résultat final :", resultat);
+    
+    console.log("Résultat attendu : ", nombre1-nombre2);
+
+
     const nombre = 14.123456789;
     const result1 = convertir_en_binaire(nombre);
     console.log(`Le nombre ${nombre} en binaire (64 bits decimaux) est : ${result1.binaire}`);
