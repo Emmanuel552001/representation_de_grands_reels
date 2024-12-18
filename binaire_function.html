@@ -5,9 +5,8 @@
         const [entier_string, decimal_string] = nombre.toString().split('.');
         const binaire_entier = entier_en_binaire(parseInt(entier_string, 10));
         const binaire_decimale= decimal_en_binaire(decimal_string);
-        return {
-            binaire: `${binaire_entier}.${binaire_decimale}`
-            };
+
+        return `${binaire_entier}.${binaire_decimale}`;
     }
     
     function decimal_en_binaire(decimal_string) {
@@ -52,8 +51,8 @@
     // fonction pour soustraire 2 nombres
     function soustraction_binaire(nombre1, nombre2) {
         // conversion des nombres décimaux en binaire
-        const binaire1 = convertir_en_binaire(nombre1).binaire;
-        const binaire2 = convertir_en_binaire(nombre2).binaire;
+        const binaire1 = convertir_en_binaire(nombre1);
+        const binaire2 = convertir_en_binaire(nombre2);
 
         console.log(`Nombre 1 (${nombre1}) en binaire : ${binaire1}`);
         console.log(`Nombre 2 (${nombre2}) en binaire : ${binaire2}`);
@@ -63,6 +62,7 @@
         const [entier2, dec2 = ""] = binaire2.split('.');
 
         // aligner les longueurs des parties entière et décimale
+        // exemple : 11 != 1001 => il faut aligner (rajouter des 0) pour pouvoir calculer
         const maxLongueurEntiers = Math.max(entier1.length, entier2.length);
         const maxLongueurDecimales = Math.max(dec1.length, dec2.length);
 
