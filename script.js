@@ -254,6 +254,8 @@ function evaluerNPI(expression) {
         console.log(typeof(element))
         if (isOperande(element)) {
             pile.push(element);
+            console.log(pile)
+
         } else if (isOperateur(element)) {
             const operande2 = pile.pop();
             const operande1 = pile.pop();
@@ -276,19 +278,24 @@ function evaluerNPI(expression) {
                     throw new Error(`Operateur non reconnu : ${element}`);
             }
             pile.push(resultat);
-        } else {
-            throw new Error(`element non reconnu : ${element}`);
+        } else if (element === "") {
+            continue;
         }
+        else {throw new Error(`element non reconnu : ${element}`);}
     }
 
     return pile.pop();
 }
 
 function isOperande(element) {
-    return !isNaN(parseFloat(element));
+    return(!isNaN(parseFloat(element)));
 }
 
 function isOperateur(element) {
     return ['+', '-', '*', '/'].includes(element);
 }
-
+let y = convertir_en_binaire(12);
+console.log(convertir_binaire_en_decimal(y))
+let x=addition_binaire(12,6); // comportement etrange ici pour les valeurs paire
+console.log(x);
+console.log(convertir_binaire_en_decimal(x));
