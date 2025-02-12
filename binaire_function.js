@@ -39,6 +39,7 @@ function calculate() {
 
                 // on ajoute le résultat dans la pile
                 pile.push(resultat);
+                afficherNbsEnBinaire(a, b, resultat.binaire);
             }
             else {
                 console.error("Pas assez d'éléments dans la pile pour faire le calcul");
@@ -70,6 +71,23 @@ function afficherObjetDansResultat(objet) {
     const resultatDiv = document.getElementById("result");
     resultatDiv.textContent = JSON.stringify(objet, null, 2); // Affichage au format JSON
 }
+
+// faire un foreach pour afficher les nombres en binaires (les deux nb donnés et le nb résultat)
+// Fonction pour afficher les nombres en binaire dans le champ "Conversion Binaire"
+// petite aide de chatgpt pour avoir un modèle similaire à la fonction précédente
+function afficherNbsEnBinaire(nb1, nb2, nb3) {
+    const objet = {
+        nombre1: convertir_en_binaire(nb1),
+        nombre2: convertir_en_binaire(nb2),
+        resultat: nb3
+    };
+
+    // affichage dans l'html
+    // id = binaryDisplay
+    const affichage = document.getElementById("binaryDisplay");
+    affichage.textContent = JSON.stringify(objet, null, 3);
+}
+
 
 function convertir_en_binaire(nombre) {
 
