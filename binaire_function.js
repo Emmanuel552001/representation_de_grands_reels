@@ -22,7 +22,8 @@ function calculate() {
                 // faire le calcul en fonction de l'opérateur
                 switch (element) {
                     case "+":
-                        resultat = addition_binaire(a,b);
+                        //resultat = addition_binaire(a,b);
+                        resultat = addition_binaire(a, b); // fonction addition par Bertille
                         break;
                     case "-":
                         resultat = soustraction_binaire(a, b);
@@ -136,11 +137,13 @@ function entier_en_binaire(n) {
     return binaire.join('');
 }
 
+// mise en com pour les tests avec la fonction addition  de Bertille
+/*
 function addition_binaire(x, y) {
     /* separerr la partie decimale et la partie entiere de chaque nombre
     faire une addition bit par bit de la partie decimal 
     additionner les partie decimal d'un cote puis ajouter la retenue s'il y en a à la somme */
-
+/*
     let x_binaire = convertir_en_binaire(x);
     const [x_entier, x_decimal] = x_binaire.split('.');
     let y_binaire = convertir_en_binaire(y);
@@ -310,7 +313,117 @@ function convertir_binaire_en_decimal(binaire) {
     return entierDecimal + decimalDecimal;
 }
 
+
+/* Fonction ADDITION basée sur soustraction
+aidée de chatgpt */
+// fonction pour additionner
+// fonction pour additionner 2 nombres
+// aide de chatgpt car erreurs au 13/02/25
+function addition_binaire(nombre1, nombre2) {
+    // conversion des nombres décimaux en binaire
+    const binaire1 = convertir_en_binaire(nombre1);
+    const binaire2 = convertir_en_binaire(nombre2);
+
+    console.log(convertir_en_binaire(nombre1));
+    console.log(convertir_en_binaire(nombre2));
+
+
+    console.log(`Nombre 1 (${nombre1}) en binaire : ${binaire1}`);
+    console.log(`Nombre 2 (${nombre2}) en binaire : ${binaire2}`);
+
+    // séparer les parties entière et décimale
+    const [entier1, dec1 = ""] = binaire1.split('.');
+    const [entier2, dec2 = ""] = binaire2.split('.');
+
+    // aligner les longueurs des parties entière et décimale
+    const maxLongueurEntiers = Math.max(entier1.length, entier2.length);
+    const maxLongueurDecimales = Math.max(dec1.length, dec2.length);
+
+    let entier1Align = entier1.padStart(maxLongueurEntiers, '0');
+    let entier2Align = entier2.padStart(maxLongueurEntiers, '0');
+    const dec1Align = dec1.padEnd(maxLongueurDecimales, '0');
+    const dec2Align = dec2.padEnd(maxLongueurDecimales, '0');
+
+    // additionner les parties entière et décimale
+    const { resultat: resultatDecimales, retenue: retenueDecimale } = addition_binaire_alignee(dec1Align, dec2Align);
+
+    // addition de la partie entière avec retenue si nécessaire
+    /*
+    const { resultat: resultatEntiers } = retenueDecimale === 1
+        ? addition_binaire_alignee(entier1Align, ajouter_retenue(entier2Align))
+        : addition_binaire_alignee(entier1Align, entier2Align);
+    */
+   /*
+    if (retenueDecimale === 1) {
+        entier2Align = ajouter_retenue(entier2Align);
+    }
+        */
+    console.log(`Retenue décimale avant addition entière : ${retenueDecimale}`);
+    const { resultat: resultatEntiers } = addition_binaire_alignee(entier1Align, entier2Align, retenueDecimale); 
+    console.log(`Résultat partie entière après ajout retenue : ${resultatEntiers}`);
+
+    // combiner les parties entière et décimale
+    const resultatBinaire = resultatDecimales ? `${resultatEntiers}.${resultatDecimales}` : resultatEntiers;
+
+    // convertir le résultat binaire en décimal
+    const resultatDecimal = convertir_binaire_en_decimal(resultatBinaire);
+
+    // vérification de la cohérence
+    const verifDecimal = nombre1 + nombre2;
+    const coherent = Math.abs(resultatDecimal - verifDecimal) < 1e-10;
+
+    // affichage des résultats
+    console.log(`Résultat binaire : ${resultatBinaire}`);
+    console.log(`Résultat décimal (depuis le binaire) : ${resultatDecimal}`);
+    console.log(`Vérification cohérence : ${coherent ? "OK" : "Erreur"}`);
+
+    return {
+        binaire: resultatBinaire,
+        decimal: resultatDecimal,
+        coherent
+    };
+}
+
+// fonction qui fait l'addition  de 2 chaines binaires alignées
+function addition_binaire_alignee(binaire1, binaire2, retenueInitiale = 0) {
+    console.log(`Addition alignée: ${binaire1} + ${binaire2}, avec retenue initiale: ${retenueInitiale}`);
+    let retenue = retenueInitiale;
+    const resultat = [];
+    const longueur = binaire1.length;
+
+    for (let i = longueur - 1; i>=0; i--) {
+        const bit1 = parseInt(binaire1[i] || '0', 10);
+        const bit2 = parseInt(binaire2[i] || '0', 10);
+
+        let somme = bit1 + bit2 + retenue;
+        if (somme === 2) {
+            resultat.unshift(0);
+            //somme -= 2; // gestion de la retenue
+            retenue = 1;
+        } else if (somme === 3) {
+            resultat.unshift(1);
+            retenue = 1;
+        }
+        else {
+            resultat.unshift(somme);
+            retenue = 0;
+        }
+
+        //resultat.unshift(somme); // ajoute le bit au début
+        //console.log(resultat)
+    }
+
+    if (retenue === 1) {
+        resultat.unshift(1);
+    }
+
+    //return { resultat: resultatStr, retenue };
+    return { resultat: resultat.join(''), retenue };
+}
+
+
 /* BERTILLE */
+console.log(addition_binaire(12.50, 11.50));
 
 let resultat = addition_binaire(4.5, 8.7);
 console.log(`L'addition binaire de ${4.5} et ${8.7} : ${resultat}`);
