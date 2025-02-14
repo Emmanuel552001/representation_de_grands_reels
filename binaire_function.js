@@ -138,12 +138,11 @@ function entier_en_binaire(n) {
 }
 
 // mise en com pour les tests avec la fonction addition  de Bertille
-/*
 function addition_binaire(x, y) {
     /* separerr la partie decimale et la partie entiere de chaque nombre
     faire une addition bit par bit de la partie decimal 
     additionner les partie decimal d'un cote puis ajouter la retenue s'il y en a à la somme */
-/*
+    
     let x_binaire = convertir_en_binaire(x);
     const [x_entier, x_decimal] = x_binaire.split('.');
     let y_binaire = convertir_en_binaire(y);
@@ -319,6 +318,7 @@ aidée de chatgpt */
 // fonction pour additionner
 // fonction pour additionner 2 nombres
 // aide de chatgpt car erreurs au 13/02/25
+/*
 function addition_binaire(nombre1, nombre2) {
     // conversion des nombres décimaux en binaire
     const binaire1 = convertir_en_binaire(nombre1);
@@ -358,6 +358,7 @@ function addition_binaire(nombre1, nombre2) {
         entier2Align = ajouter_retenue(entier2Align);
     }
         */
+       /*
     console.log(`Retenue décimale avant addition entière : ${retenueDecimale}`);
     const { resultat: resultatEntiers } = addition_binaire_alignee(entier1Align, entier2Align, retenueDecimale); 
     console.log(`Résultat partie entière après ajout retenue : ${resultatEntiers}`);
@@ -419,11 +420,11 @@ function addition_binaire_alignee(binaire1, binaire2, retenueInitiale = 0) {
 
     //return { resultat: resultatStr, retenue };
     return { resultat: resultat.join(''), retenue };
-}
+}*/
 
 
 /* BERTILLE */
-console.log(addition_binaire(12.50, 11.50));
+//console.log(addition_binaire(12.50, 11.50));
 
 let resultat = addition_binaire(4.5, 8.7);
 console.log(`L'addition binaire de ${4.5} et ${8.7} : ${resultat}`);
