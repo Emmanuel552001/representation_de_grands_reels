@@ -1,301 +1,256 @@
+document.getElementById("calculateBtn").addEventListener("click", () => {
+    const expressionInput = document.getElementById("expression").value.trim();
+    const expression = expressionInput.split(" ");
+    try {
+        const result = evaluer_rpn(expression);
+        document.getElementById("result").textContent = `Résultat : ${result}`;
+    } catch (error) {
+        document.getElementById("result").textContent = `Erreur : ${error.message}`;
+    }
+});
+
 function convertir_en_binaire(nombre) {
-    const [entier_string, decimal_string] = nombre.toString().split('.');
-    const binaire_entier = entier_en_binaire(parseInt(entier_string, 10));
-    const binaire_decimal = decimal_en_binaire(decimal_string);
-    return `${binaire_entier}.${binaire_decimal}`;
+    const [signe, entierStr, decimalStr] = analyserNombre(nombre.toString());
+    const entier = BigInt(entierStr);
+
+    let bit_signe = signe ? '1' : '0';
+    let bit_entier = entier.toString(2).padStart(63, '0').slice(-63);
+    let bit_decimal = decimal_en_binaire(decimalStr);
+    return `${bit_signe}.${bit_entier}.${bit_decimal}`;
 }
 
-function decimal_en_binaire(decimal_string) {
-    const puissances_negatives2 = [];
-    for (let i = 1; i <= 64; i++) {
-        puissances_negatives2.push(Math.pow(2, -i));
-    }
+function analyserNombre(nombreStr) {
+    const signe = nombreStr.startsWith('-');
+    const [entierPart, decimalPart = '0'] = nombreStr.replace('-', '').split('.');
+    return [signe, entierPart || '0', decimalPart];
+}
 
-    let partieDecimale = decimal_string ? parseFloat(`0.${decimal_string}`) : 0;
-    let binaire_decimale = '';
-
-    for (const puissance of puissances_negatives2) {
-        if (partieDecimale >= puissance) {
-            binaire_decimale += '1';
-            partieDecimale -= puissance;
+function decimal_en_binaire(decimalStr) {
+    let decimal = parseFloat(`0.${decimalStr}`);
+    let bits = '';
+    
+    while (decimal > 0 && bits.length < 64) {
+        decimal *= 2;
+        if (decimal >= 1) {
+            bits += '1';
+            decimal -= 1;
         } else {
-            binaire_decimale += '0';
+            bits += '0';
         }
     }
-
-    return binaire_decimale;
+    
+    return bits.padEnd(64, '0');
 }
-
-function entier_en_binaire(n) {
-    const puissancesDe2 = [];
-    for (let i = 0; i < 63; i++) {
-        puissancesDe2.push(Math.pow(2, i));
-    }
-
-    const binaire = [];
-    for (let i = 62; i >= 0; i--) {
-        if (n >= puissancesDe2[i]) {
-            binaire.push(1);
-            n -= puissancesDe2[i];
-        } else {
-            binaire.push(0);
-        }
-    }
-    return binaire.join('');
-}
-
-
-
-// les calculs 
+console.log("-2 :" + convertir_en_binaire(-2))
 
 function addition_binaire(x, y) {
     let x_binaire = convertir_en_binaire(x);
-    const [x_entier, x_decimal] = x_binaire.split('.');
     let y_binaire = convertir_en_binaire(y);
-    const [y_entier, y_decimal] = y_binaire.split('.');
 
-    let retenue = 0;
-    let resultat_entier = '';
-    let resultat_decimal = '';
+    let [signe_x, x_entier, x_decimal] = x_binaire.split('.');
+    let [signe_y, y_entier, y_decimal] = y_binaire.split('.');
 
-    for (let i = 1; i <= 64; i++) {
-        let bit_x = i < x_decimal.length ? parseInt(x_decimal[i]) : 0;
-        let bit_y = i < y_decimal.length ? parseInt(y_decimal[i]) : 0;
+    let negatif_x = signe_x === '1';
+    let negatif_y = signe_y === '1';
 
-        let somme = bit_x + bit_y + retenue;
-        if (somme === 2) {
-            resultat_decimal = '0' + resultat_decimal;
-            retenue = 1;
-        } else if (somme === 3) {
-            resultat_decimal = '1' + resultat_decimal;
-            retenue = 1;
-        } else {
-            resultat_decimal = somme.toString() + resultat_decimal;
-            retenue = 0;
-        }
+    if (negatif_x && !negatif_y) {
+        return soustraction_binaire(y, x); 
+    } else if (!negatif_x && negatif_y) {
+        return soustraction_binaire(x, y);
     }
 
-    for (let i = 0; i < 63; i++) {
-        let bit_x = i < x_entier.length ? parseInt(x_entier[i]) : 0;
-        let bit_y = i < y_entier.length ? parseInt(y_entier[i]) : 0;
+    let max_entier = Math.max(x_entier.length, y_entier.length);
+    let max_decimal = Math.max(x_decimal.length, y_decimal.length);
+    
+    let x_entier_norm = x_entier.padStart(max_entier, '0');
+    let y_entier_norm = y_entier.padStart(max_entier, '0');
+    
+    let x_decimal_norm = x_decimal.padEnd(max_decimal, '0');
+    let y_decimal_norm = y_decimal.padEnd(max_decimal, '0');
+
+    let retenue = 0;
+    let resultat_decimal = '';
+    let resultat_entier = '';
+
+    for (let i = max_decimal - 1; i >= 0; i--) {
+        let bit_x = parseInt(x_decimal_norm[i]);
+        let bit_y = parseInt(y_decimal_norm[i]);
 
         let somme = bit_x + bit_y + retenue;
-        if (somme === 2) {
-            resultat_entier += '0';
-            retenue = 1;
-        } else if (somme === 3) {
-            resultat_entier += '1';
-            retenue = 1;
-        } else {
-            resultat_entier += somme.toString();
-            retenue = 0;
-        }
+        resultat_decimal = (somme % 2) + resultat_decimal;
+        retenue = Math.floor(somme / 2);
+    }
+
+    for (let i = max_entier - 1; i >= 0; i--) {
+        let bit_x = parseInt(x_entier_norm[i]);
+        let bit_y = parseInt(y_entier_norm[i]);
+
+        let somme = bit_x + bit_y + retenue;
+        resultat_entier = (somme % 2) + resultat_entier;
+        retenue = Math.floor(somme / 2);
     }
 
     if (retenue === 1) {
         resultat_entier = '1' + resultat_entier;
     }
-    return resultat_entier + '.' + resultat_decimal;
+
+    let signe_resultat = negatif_x ? '1' : '0';
+
+    return `${signe_resultat}.${resultat_entier}.${resultat_decimal}`;
 }
 
+function soustraction_binaire(x, y) {
+    let x_binaire = convertir_en_binaire(x);
+    let y_binaire = convertir_en_binaire(y);
 
-/*bertille */
+    let [signe_x, x_entier, x_decimal] = x_binaire.split('.');
+    let [signe_y, y_entier, y_decimal] = y_binaire.split('.');
 
-// Fonction pour soustraire 2 nombres binaires
-function soustraction_binaire(nombre1, nombre2) {
-    // Conversion des nombres décimaux en binaire en utilisant votre fonction convertir_en_binaire
-    const binaire1 = convertir_en_binaire(nombre1);
-    const binaire2 = convertir_en_binaire(nombre2);
+    let negatif_x = signe_x === '1';
+    let negatif_y = signe_y === '1';
 
-    console.log(`Nombre 1 (${nombre1}) en binaire : ${binaire1}`);
-    console.log(`Nombre 2 (${nombre2}) en binaire : ${binaire2}`);
+    if (negatif_y) {
+        return addition_binaire(x, y.slice(1));
+    }
 
-    // Séparer les parties entière et décimale
-    const [entier1, dec1 = ""] = binaire1.split('.');
-    const [entier2, dec2 = ""] = binaire2.split('.');
+    if (negatif_x) {
+        return `-${addition_binaire(x.slice(1), y)}`;
+    }
 
-    // Aligner les longueurs des parties entière et décimale
-    const maxLongueurEntiers = Math.max(entier1.length, entier2.length);
-    const maxLongueurDecimales = Math.max(dec1.length, dec2.length);
+    let max_entier = Math.max(x_entier.length, y_entier.length);
+    let max_decimal = Math.max(x_decimal.length, y_decimal.length);
 
-    const entier1Align = entier1.padStart(maxLongueurEntiers, '0');
-    const entier2Align = entier2.padStart(maxLongueurEntiers, '0');
-    const dec1Align = dec1.padEnd(maxLongueurDecimales, '0');
-    const dec2Align = dec2.padEnd(maxLongueurDecimales, '0');
+    let x_entier_norm = x_entier.padStart(max_entier, '0');
+    let y_entier_norm = y_entier.padStart(max_entier, '0');
 
-    // Soustraction des parties entière et décimale
-    const { resultat: resultatDecimales, retenue: retenueDecimale } = soustraction_binaire_alignee(dec1Align, dec2Align, true);
+    let x_decimal_norm = x_decimal.padEnd(max_decimal, '0');
+    let y_decimal_norm = y_decimal.padEnd(max_decimal, '0');
 
-    // Soustraction de la partie entière avec retenue si besoin
-    const { resultat: resultatEntiers } = retenueDecimale === 1
-        ? soustraction_binaire_alignee(entier1Align, ajouter_retenue(entier2Align))
-        : soustraction_binaire_alignee(entier1Align, entier2Align);
-
-    // Combiner les parties entière et décimale
-    const resultatBinaire = `${resultatEntiers}.${resultatDecimales}`;
-
-    // Convertir le résultat binaire en décimal
-    const resultatDecimal = convertir_binaire_en_decimal(resultatBinaire);
-
-    // Vérification de la cohérence
-    const verifDecimal = nombre1 - nombre2;
-    const coherent = Math.abs(resultatDecimal - verifDecimal) < 1e-10;
-
-    // Affichage des résultats
-    console.log(`Résultat binaire : ${resultatBinaire}`);
-    console.log(`Résultat décimal (depuis le binaire) : ${resultatDecimal}`);
-    console.log(`Vérification cohérence : ${coherent ? "OK" : "Erreur"}`);
-
-    return {
-        binaire: resultatBinaire,
-        decimal: resultatDecimal,
-        coherent
-    };
-}
-
-// Fonction pour soustraire deux chaînes binaires alignées
-function soustraction_binaire_alignee(binaire1, binaire2, isDecimal = false) {
     let retenue = 0;
-    const resultat = [];
-    const longueur = binaire1.length;
+    let resultat_decimal = '';
+    let resultat_entier = '';
 
-    for (let i = longueur - 1; i >= 0; i--) {
-        const bit1 = parseInt(binaire1[i] || '0', 10);
-        const bit2 = parseInt(binaire2[i] || '0', 10);
+    // Soustraction des parties décimales
+    for (let i = max_decimal - 1; i >= 0; i--) {
+        let bit_x = parseInt(x_decimal_norm[i]);
+        let bit_y = parseInt(y_decimal_norm[i]) + retenue;
 
-        let diff = bit1 - bit2 - retenue;
-        if (diff < 0) {
-            diff += 2; // Gestion de la retenue
+        if (bit_x < bit_y) {
+            bit_x += 2;
             retenue = 1;
         } else {
             retenue = 0;
         }
 
-        resultat.unshift(diff); // Ajoute le bit au début
+        resultat_decimal = (bit_x - bit_y) + resultat_decimal;
     }
 
-    // Convertir le tableau en chaîne
-    let resultatStr = resultat.join('');
+    for (let i = max_entier - 1; i >= 0; i--) {
+        let bit_x = parseInt(x_entier_norm[i]);
+        let bit_y = parseInt(y_entier_norm[i]) + retenue;
 
-    // Si ce n'est pas un nombre décimal, supprimer les zéros en tête
-    if (!isDecimal) {
-        resultatStr = resultatStr.replace(/^0+/, '') || '0';
-    }
-
-    return { resultat: resultatStr, retenue };
-}
-
-// Ajout d'une retenue à une chaîne binaire
-function ajouter_retenue(binaire) {
-    const longueur = binaire.length;
-    let resultat = [];
-    let retenue = 1;
-
-    for (let i = longueur - 1; i >= 0; i--) {
-        const bit = parseInt(binaire[i], 10) + retenue;
-        if (bit === 2) {
-            resultat.unshift(0);
+        if (bit_x < bit_y) {
+            bit_x += 2;
             retenue = 1;
         } else {
-            resultat.unshift(bit);
             retenue = 0;
+        }
+
+        resultat_entier = (bit_x - bit_y) + resultat_entier;
+    }
+
+    if (retenue === 1) {
+        return `-${soustraction_binaire(y, x)}`;
+    }
+
+    return `0.${resultat_entier}.${resultat_decimal}`;}
+
+
+function multiplication_binaire(x, y) {
+    let x_binaire = convertir_en_binaire(x);
+    let y_binaire = convertir_en_binaire(y);
+
+    let [signe_x, x_entier, x_decimal] = x_binaire.split('.');
+    let [signe_y, y_entier, y_decimal] = y_binaire.split('.');
+
+    let negatif_x = signe_x === '1';
+    let negatif_y = signe_y === '1';
+    let signe_resultat = (negatif_x ^ negatif_y) ? '1' : '0';
+
+    let x_full = BigInt("0b" + x_entier + x_decimal);
+    let y_full = BigInt("0b" + y_entier + y_decimal);
+
+    let produit = x_full * y_full;
+
+    let produit_binaire = produit.toString(2).padStart(x_entier.length + x_decimal.length + y_entier.length + y_decimal.length, '0');
+
+    let bit_entier = produit_binaire.slice(0, x_entier.length + y_entier.length);
+    let bit_decimal = produit_binaire.slice(x_entier.length + y_entier.length).padEnd(64, '0');
+
+    return `${signe_resultat}.${bit_entier}.${bit_decimal}`;
+}
+
+function division_binaire(x, y) {
+    if (y === "0") {
+        throw new Error("Division par zéro !");
+    }
+
+    let x_binaire = convertir_en_binaire(x);
+    let y_binaire = convertir_en_binaire(y);
+    let [signe_x, x_entier, x_decimal] = x_binaire.split('.');
+    let [signe_y, y_entier, y_decimal] = y_binaire.split('.');
+    let negatif_x = signe_x === '1';
+    let negatif_y = signe_y === '1';
+    let signe_resultat = (negatif_x ^ negatif_y) ? '1' : '0';
+    let x_full = BigInt("0b" + x_entier + x_decimal.padEnd(64, '0')); 
+    let y_full = BigInt("0b" + y_entier + y_decimal.padEnd(64, '0'));
+    let quotient = x_full / y_full;
+    let reste = x_full % y_full;
+    let quotient_binaire = quotient.toString(2);
+    let bit_decimal = '';
+    for (let i = 0; i < 64; i++) {
+        reste *= 2n;
+        if (reste >= y_full) {
+            bit_decimal += '1';
+            reste -= y_full;
+        } else {
+            bit_decimal += '0';
         }
     }
 
-    return resultat.join('');
+    return `${signe_resultat}.${quotient_binaire}.${bit_decimal}`;
 }
 
-// Fonction pour convertir un nombre binaire (sous forme "entier.décimal") en décimal
-function convertir_binaire_en_decimal(binaire) {
-    const [entier, decimale = ""] = binaire.split('.');
-    const entierDecimal = parseInt(entier, 2);
-    let decimalDecimal = 0;
+function evaluer_rpn(expression) {
+    let stack = [];
 
-    for (let i = 0; i < decimale.length; i++) {
-        decimalDecimal += parseInt(decimale[i], 10) * Math.pow(2, -(i + 1));
-    }
-
-    return entierDecimal + decimalDecimal;
-}
-/* bertille */
-
-
-
-function calculate() {
-    const expression = document.getElementById('expression').value;
-    
-    if (!expression) {
-        alert('Entre une expression valide.');
-        return;
-    }
-    const resultat = evaluerNPI(expression);
-    console.log(resultat)
-    afficher_resultat(resultat);
-}
-function afficher_resultat(resultat) {
-    document.getElementById('result').innerText = `Résultat : ${resultat}`;
-    document.getElementById('binaryDisplay').innerText = `En binaire : ${convertir_en_binaire(resultat)}`;
-}
-
-document.getElementById('calculateBtn').addEventListener('click', calculate);
-
-
-
-
-// notation plonaise inverseéé
-/* declarer une pile , empiler si nombre sinon desempiler faire calcul et rempiler resultat*/
-function evaluerNPI(expression) {
-    
-    const pile = [];
-    const elements = expression.split(' ');
-    console.log(elements);
-    
-    for (const element of elements) {
-        console.log(typeof(element))
-        if (isOperande(element)) {
-            pile.push(element);
-            console.log(pile)
-
-        } else if (isOperateur(element)) {
-            const operande2 = pile.pop();
-            const operande1 = pile.pop();
-
-            let resultat;
-            switch (element) {
-                case '+':
-                    resultat = addition_binaire(operande1,operande2);
-                    break;
-                case '-':
-                    resultat = soustraction_binaire(operande1,operande2);
-                    break;
-                case '*':
-                    resultat = multiplication_binaire(operande1,operande2);
-                    break;
-                case '/':
-                    resultat = division_binaire(operande1,operande2);;
-                    break;
-                default:
-                    throw new Error(`Operateur non reconnu : ${element}`);
+    for (let token of expression) {
+        if (["+", "-", "*", "/"].includes(token)) {
+            if (stack.length < 2) {
+                throw new Error("Expression RPN invalide !");
             }
-            pile.push(resultat);
-        } else if (element === "") {
-            continue;
+            let b = stack.pop();
+            let a = stack.pop();
+
+            if (token === "+") {
+                stack.push(addition_binaire(a, b));
+            } else if (token === "-") {
+                stack.push(soustraction_binaire(a, b));
+            } else if (token === "*") {
+                stack.push(multiplication_binaire(a, b));
+            } else if (token === "/") {
+                stack.push(division_binaire(a, b));
+            }
+        } else {
+            if (isNaN(parseFloat(token))) {
+                throw new Error(`Nombre invalide : ${token}`);
+            }
+            stack.push(token);
         }
-        else {throw new Error(`element non reconnu : ${element}`);}
     }
 
-    return pile.pop();
+    if (stack.length !== 1) {
+        throw new Error("Expression RPN mal formée !");
+    }
+    return stack[0];
 }
-
-function isOperande(element) {
-    return(!isNaN(parseFloat(element)));
-}
-
-function isOperateur(element) {
-    return ['+', '-', '*', '/'].includes(element);
-}
-let y = convertir_en_binaire(12);
-console.log(convertir_binaire_en_decimal(y))
-let x=addition_binaire(12,6); // comportement etrange ici pour les valeurs paire
-console.log(x);
-console.log(convertir_binaire_en_decimal(x));
