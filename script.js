@@ -21,14 +21,15 @@ function evaluer_rpn(expression) {
             let a = stack.pop();
 
             if (token === "+") {
-                stack.push(addition_binaire(a, b));
+                stack.push(convertir_binaire_en_decimal(addition_binaire(a, b)));
             } else if (token === "-") {
-                stack.push(soustraction_binaire(a, b));
+                stack.push(convertir_binaire_en_decimal(soustraction_binaire(a, b)));
             } else if (token === "*") {
-                stack.push(multiplication_binaire(a, b));
+                stack.push(convertir_binaire_en_decimal(multiplication_binaire(a, b)));
             } else if (token === "/") {
-                stack.push(division_binaire(a, b));
+                stack.push(convertir_binaire_en_decimal(division_binaire(a, b)));
             }
+            // il push le resultat sans le signe
         } else {
             if (isNaN(parseFloat(token))) {
                 throw new Error(`Nombre invalide : ${token}`);
@@ -77,6 +78,22 @@ function decimal_en_binaire(decimalStr) {
     return bits.padEnd(64, '0');
 }
 console.log("-1.25 :" + convertir_en_binaire(-1.25))
+
+function convertir_binaire_en_decimal(binaire) {
+    let [signe, partie_entiere, partie_decimale] = binaire.split('.');
+    let entier_decimal = parseInt(partie_entiere, 2);
+    let decimal = 0;
+    for (let i = 0; i < partie_decimale.length; i++) {
+        decimal += parseInt(partie_decimale[i]) * Math.pow(2, -(i + 1));
+    }
+    let resultat = entier_decimal + decimal;
+    if (signe === '1') {
+        resultat *= -1;
+    }
+    
+    return resultat;
+}
+console.log("-2,2.200785525 * : " + convertir_binaire_en_decimal(multiplication_binaire(-2,2.200785525)) )
 
 function addition_binaire(x, y) {
     let x_binaire = convertir_en_binaire(x);
@@ -210,11 +227,11 @@ function multiplication_binaire(x, y) {
     let bit_entier = produit_binaire.slice(0, entier_length) || '0';
     let bit_decimal = produit_binaire.slice(entier_length).padEnd(64, '0');
     bit_entier = bit_entier.slice(63);
-    bit_decimal = bit_decimal.slice(63);
+    bit_decimal = bit_decimal.slice(0,64);
 
     return `${signe_resultat}.${bit_entier}.${bit_decimal}`;
 }
-console.log("2 2 * " + multiplication_binaire(2,2) )
+console.log("2,2.200785525 * " + multiplication_binaire(2,2.200785525) )
 function division_binaire(x, y) {
     if (y === "0") {
         throw new Error("Division par zéro !");
@@ -245,4 +262,4 @@ function division_binaire(x, y) {
 
     return `${signe_resultat}.${quotient_binaire}.${bit_decimal}`;
 }
-
+console.log("2,2.200785525 / : " + division_binaire(4,2.200785525) )
