@@ -19,12 +19,17 @@ function evaluer_rpn(expression) {
             }
             let b = stack.pop();
             let a = stack.pop();
+            verification(a);
+            verification(b);
 
             if (token === "+") {
+                verification(BigInt(a+b));
                 stack.push(convertir_binaire_en_decimal(addition_binaire(a, b)));
             } else if (token === "-") {
+                verification(BigInt(a-b));
                 stack.push(convertir_binaire_en_decimal(soustraction_binaire(a, b)));
             } else if (token === "*") {
+                verification(BigInt(a*b));
                 stack.push(convertir_binaire_en_decimal(multiplication_binaire(a, b)));
             } else if (token === "/") {
                 stack.push(convertir_binaire_en_decimal(division_binaire(a, b)));
@@ -45,21 +50,35 @@ function evaluer_rpn(expression) {
 }
 
 
+
 function convertir_en_binaire(nombre) {
+    
     const [signe, entierStr, decimalStr] = analyserNombre(nombre.toString());
     const entier = BigInt(entierStr);
-
-    let bit_signe = signe ? '1' : '0';
-    let bit_entier = entier.toString(2).padStart(63, '0').slice(-63);
-    let bit_decimal = decimal_en_binaire(decimalStr);
-    return `${bit_signe}.${bit_entier}.${bit_decimal}`;
-}
+      let bit_signe = signe ? '1' : '0';
+      let bit_entier = entier.toString(2).padStart(63, '0').slice(-63);
+      let bit_decimal = decimal_en_binaire(decimalStr);
+      return `${bit_signe}.${bit_entier}.${bit_decimal}`;
+    }
 
 function analyserNombre(nombreStr) {
     const signe = nombreStr.startsWith('-');
     const [entierPart, decimalPart = '0'] = nombreStr.replace('-', '').split('.');
     return [signe, entierPart || '0', decimalPart];
 }
+function verification(nombre) {
+    const nbremaxentier = 2n ** 63n - 1n
+    const nbremaxdecimal = Math.pow(2, -64)
+    const [signe, entier, decimal] = analyserNombre(nombre.toString());
+    if (BigInt(entier) > nbremaxentier){
+        throw new Error("Le nombre dépasse la limite de 63 bits");
+      }
+      // si j'utilise un parsefloat , j'aurai un problème de precision au dela de 53 bits
+    if(parseFloat(`0.${decimal}`) < Math.pow(2, -64)){}
+    throw new Error("La partie décimale dépasse la limite de 64 bits");
+    
+}
+console.log(analyserNombre("4.2875"))
 
 function decimal_en_binaire(decimalStr) {
     let decimal = parseFloat(`0.${decimalStr}`);
@@ -77,7 +96,7 @@ function decimal_en_binaire(decimalStr) {
     
     return bits.padEnd(64, '0');
 }
-console.log("-1.25 :" + convertir_en_binaire(-1.25))
+//console.log("-1.25 :" + convertir_en_binaire(-1.25))
 
 function convertir_binaire_en_decimal(binaire) {
     let [signe, partie_entiere, partie_decimale] = binaire.split('.');
@@ -93,7 +112,7 @@ function convertir_binaire_en_decimal(binaire) {
     
     return resultat;
 }
-console.log("-2,2.200785525 * : " + convertir_binaire_en_decimal(multiplication_binaire(-2,2.200785525)) )
+//console.log("-2,2.200785525 * : " + convertir_binaire_en_decimal(multiplication_binaire(-2,2.200785525)) )
 
 function addition_binaire(x, y) {
     let x_binaire = convertir_en_binaire(x);
@@ -135,8 +154,8 @@ function addition_binaire(x, y) {
     if (retenue === 1) {
         resultat_entier = '1' + resultat_entier;
     }
-
     let signe_resultat = negatif_x ? '1' : '0';
+    console.log(`${signe_resultat}.${resultat_entier}.${resultat_decimal}`)
     return `${signe_resultat}.${resultat_entier}.${resultat_decimal}`;
 }
 
@@ -231,7 +250,7 @@ function multiplication_binaire(x, y) {
 
     return `${signe_resultat}.${bit_entier}.${bit_decimal}`;
 }
-console.log("2,2.200785525 * " + multiplication_binaire(2,2.200785525) )
+//console.log("2,2.200785525 * " + multiplication_binaire(2,2.200785525) )
 function division_binaire(x, y) {
     if (y === "0") {
         throw new Error("Division par zéro !");
@@ -262,4 +281,25 @@ function division_binaire(x, y) {
 
     return `${signe_resultat}.${quotient_binaire}.${bit_decimal}`;
 }
-console.log("2,2.200785525 / : " + division_binaire(4,2.200785525) )
+//console.log("2,2.200785525 / : " + division_binaire(4,2.200785525) )
+
+/*function tester_puissances_de_deux() {
+    console.log("Puissances de 2 jusqu'à 2^63:");
+    console.log("-----------------------------------------");
+    
+    for (let i = 0; i <= 63; i++) {
+        const nombre = 2n ** BigInt(i);
+        const binaire = convertir_en_binaire(nombre);
+        console.log(`2^${i} = ${nombre} (décimal) = ${binaire} (binaire)`);
+    }
+}
+tester_puissances_de_deux();*/
+
+/*function binaire_en_bigInt(binaryStr) {
+    let result = 0n;
+    for (let i = 0; i < binaryStr.length; i++) {
+      result = result * 2n + BigInt(binaryStr[i] === "1" ? 1 : 0);
+    }
+    return result;
+  }*/
+ console.log((Math.pow(2, -64)))
