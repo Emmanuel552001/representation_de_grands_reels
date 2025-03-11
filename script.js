@@ -23,13 +23,13 @@ function evaluer_rpn(expression) {
             verification(b);
 
             if (token === "+") {
-                verification(BigInt(a+b));
+                //verification(BigInt(a+b));
                 stack.push(convertir_binaire_en_decimal(addition_binaire(a, b)));
             } else if (token === "-") {
-                verification(BigInt(a-b));
+                //verification(BigInt(a-b));
                 stack.push(convertir_binaire_en_decimal(soustraction_binaire(a, b)));
             } else if (token === "*") {
-                verification(BigInt(a*b));
+               // verification(BigInt(a*b));
                 stack.push(convertir_binaire_en_decimal(multiplication_binaire(a, b)));
             } else if (token === "/") {
                 stack.push(convertir_binaire_en_decimal(division_binaire(a, b)));
@@ -66,19 +66,26 @@ function analyserNombre(nombreStr) {
     const [entierPart, decimalPart = '0'] = nombreStr.replace('-', '').split('.');
     return [signe, entierPart || '0', decimalPart];
 }
-function verification(nombre) {
+function verification(nombre1,nombre2 =1) {
     const nbremaxentier = 2n ** 63n - 1n
-    const nbremaxdecimal = Math.pow(2, -64)
-    const [signe, entier, decimal] = analyserNombre(nombre.toString());
-    if (BigInt(entier) > nbremaxentier){
+    let [signe, entier1, decimal1] = analyserNombre(nombre1.toString());
+    entier1 = BigInt(entier1);
+    console.log(entier1)
+    console.log(nbremaxentier)
+    if (BigInt(entier1) > nbremaxentier){
         throw new Error("Le nombre dépasse la limite de 63 bits");
       }
-      // si j'utilise un parsefloat , j'aurai un problème de precision au dela de 53 bits
-    if(parseFloat(`0.${decimal}`) < Math.pow(2, -64)){}
-    throw new Error("La partie décimale dépasse la limite de 64 bits");
-    
+      
+      // verification decimal
+      const nbremaxdecimal = Math.pow(2, -64).toFixed(50).toString(); // plus petit nombre decimal sur 64 bits => 0.00000000000000000005421010862427522170037264004350
+      let [x,y] = nbremaxdecimal.split('.')
+      reference_decimal = y //.replace(/^0+/, "") || "0"; // valeur de reference pour comparaison => 00000000000000000005421010862427522170037264004350
+      console.log("decimal : " + decimal1.length)
+      console.log("reference decimal " + reference_decimal.length)
+      if (decimal1.length > reference_decimal.length) {
+        throw new Error ("Le nombre dépasse la limite des 64 bits");
+      }
 }
-console.log(analyserNombre("4.2875"))
 
 function decimal_en_binaire(decimalStr) {
     let decimal = parseFloat(`0.${decimalStr}`);
@@ -302,4 +309,13 @@ tester_puissances_de_deux();*/
     }
     return result;
   }*/
- console.log((Math.pow(2, -64)))
+
+/*
+ let m = Math.pow(2, -64).toFixed(50).toString();
+ console.log("m " + m)
+console.log (typeof(m))
+ //z = m.toFixed(50);
+// console.log("z : " + z)
+ let [x , y] = m.toString().split('.');
+ y = y.replace(/^0+/, "") || "0";
+ console.log("Y " + y); */
