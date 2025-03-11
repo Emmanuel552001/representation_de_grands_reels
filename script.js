@@ -67,7 +67,7 @@ function analyserNombre(nombreStr) {
     return [signe, entierPart || '0', decimalPart];
 }
 function verification(nombre1,nombre2 =1) {
-    const nbremaxentier = 2n ** 63n - 1n
+    const nbremaxentier = 2n ** 63n
     let [signe, entier1, decimal1] = analyserNombre(nombre1.toString());
     entier1 = BigInt(entier1);
     console.log(entier1)
@@ -83,6 +83,9 @@ function verification(nombre1,nombre2 =1) {
       console.log("decimal : " + decimal1.length)
       console.log("reference decimal " + reference_decimal.length)
       if (decimal1.length > reference_decimal.length) {
+        throw new Error ("Le nombre dépasse la limite des 64 bits");
+      }
+      if (decimal1.length = reference_decimal.length && decimal1 > reference_decimal){
         throw new Error ("Le nombre dépasse la limite des 64 bits");
       }
 }
