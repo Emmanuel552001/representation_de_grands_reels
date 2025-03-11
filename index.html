@@ -7,9 +7,37 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Navigation Verticale -->
+  <nav id="nav-menu" class="menu-container horizontal">
+      <ul class="menu-list">
+          <li>
+              <a href="./index.html" class="menu-link active">
+                  Accueil
+              </a>
+          </li>
+          <br>
+          <li>
+              <a href="./form_devoirs.html" class="menu-link">
+                  Qui sommes-nous ?
+              </a>
+          </li>
+          <br>
+          <li>
+              <a href="./edt.html" class="menu-link">
+                  Format de représentation
+              </a>
+          </li>
+          <br>
+          <li>
+              <a href="form_commande.html" class="menu-link">
+                  Exemples
+              </a>
+          </li>
+      </ul>
+  </nav> <!-- Fin de Navigation Verticale -->
   <div class="container">
     <h1>Représentation des grands nombres réels</h1>
-    <input id="expression" type="text" placeholder="Ex: 14.17 1875.09 - 195 +">
+    <input id="expression" type="text" placeholder="Ex: 14.17 + 1875.09 - 195">
     <button id="calculateBtn">Calculer</button>
 
     <div class="binary-display">
