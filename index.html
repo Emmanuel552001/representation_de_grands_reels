@@ -7,34 +7,42 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Navigation Verticale -->
-  <nav id="nav-menu" class="menu-container horizontal">
-      <ul class="menu-list">
-          <li>
-              <a href="./index.html" class="menu-link active">
-                  Accueil
-              </a>
-          </li>
-          <br>
-          <li>
-              <a href="./form_devoirs.html" class="menu-link">
-                  Qui sommes-nous ?
-              </a>
-          </li>
-          <br>
-          <li>
-              <a href="./edt.html" class="menu-link">
-                  Format de représentation
-              </a>
-          </li>
-          <br>
-          <li>
-              <a href="form_commande.html" class="menu-link">
-                  Exemples
-              </a>
-          </li>
-      </ul>
-  </nav> <!-- Fin de Navigation Verticale -->
+  <nav class="menu">
+    <a href="" data-info="info1">Accueil</a>
+    <a href="" data-info="info2">Format de représentation</a>
+    <a href="" data-info="info3">Exemples</a>
+</nav>
+<div id="rideau" class="rideau">
+  <div class="rideau-content" id="rideau-content"></div>
+</div>
+<script>
+  let rideau = document.getElementById('rideau');
+  let rideauContent = document.getElementById('rideau-content');
+  
+  document.querySelectorAll('.menu a').forEach(link => {
+      link.addEventListener('mouseenter', function() {
+          let content = {
+              info1: "Ce projet a été réalisé par AGBINKO Emmanuel et PINEAU Bertille sous la supervision de Jean Michel Richer.",
+              info2: "<p>Représentation en virgule fixe suivant un format de 128 bits.</p><img src='1.png' alt='format de représentation'><p>Nous pouvons représenter des valeurs de -2 PUISSANCE 62 + (1 - 2 PUISSANCE -64) à 2 puissance 63 + (1 - 2 puissance 64)</p>",
+              info3: "<p>78 197 + 45 * 1000 / = 12.375 </br> </br> 12.14 -15.24 + 8975 * 74.157848 / = -375.17944156092557 </br> </br> 999999999999999999 100000000000000001 + = 1100000000000000000.</p>"
+          };
+          let infoKey = this.getAttribute('data-info');
+          rideauContent.innerHTML = content[infoKey] || "Aucune information disponible.";
+          rideau.style.height = '1000px';
+      });
+      link.addEventListener('mouseleave', function() {
+          setTimeout(() => {
+              if (!rideau.matches(':hover')) {
+                  rideau.style.height = '0';
+              }
+          }, 300);
+      });
+  });
+  
+  rideau.addEventListener('mouseleave', function() {
+      rideau.style.height = '0';
+  });
+</script>
   <div class="container">
     <h1>Représentation des grands nombres réels</h1>
     <p>On représente les nombres entre ... et ...</p>

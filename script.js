@@ -29,7 +29,7 @@ function evaluer_rpn(expression) {
                 //verification(BigInt(a-b));
                 stack.push(convertir_binaire_en_decimal(soustraction_binaire(a, b)));
             } else if (token === "*") {
-               // verification(BigInt(a*b));
+               //verification(BigInt(a*b));
                 stack.push(convertir_binaire_en_decimal(multiplication_binaire(a, b)));
             } else if (token === "/") {
                 stack.push(convertir_binaire_en_decimal(division_binaire(a, b)));
@@ -77,7 +77,7 @@ function verification(nombre1,nombre2 =1) {
       }
       
       // verification decimal
-      const nbremaxdecimal = Math.pow(2, -64).toFixed(50).toString(); // plus petit nombre decimal sur 64 bits => 0.00000000000000000005421010862427522170037264004350
+     /* const nbremaxdecimal = Math.pow(2, -64).toFixed(50).toString(); // plus petit nombre decimal sur 64 bits => 0.00000000000000000005421010862427522170037264004350
       let [x,y] = nbremaxdecimal.split('.')
       reference_decimal = y //.replace(/^0+/, "") || "0"; // valeur de reference pour comparaison => 00000000000000000005421010862427522170037264004350
       console.log("decimal : " + decimal1.length)
@@ -87,7 +87,7 @@ function verification(nombre1,nombre2 =1) {
       }
       if (decimal1.length = reference_decimal.length && decimal1 > reference_decimal){
         throw new Error ("Le nombre dépasse la limite des 64 bits");
-      }
+      } */
 }
 
 function decimal_en_binaire(decimalStr) {
@@ -322,3 +322,12 @@ console.log (typeof(m))
  let [x , y] = m.toString().split('.');
  y = y.replace(/^0+/, "") || "0";
  console.log("Y " + y); */
+ console.log (Math.pow(-2, 9))
+ console.log (Math.pow(2, -9))
+ console.log((Math.pow(-2, 62)) + (1 - Math.pow(2, -9)));
+ console.log ((1 - Math.pow(2, -9)) > Math.pow(2, -9) )
+
+ console.log(Math.pow (-2, 62) )
+
+ -4
+ -4.9999
