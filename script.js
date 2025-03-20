@@ -29,7 +29,7 @@ function evaluer_rpn(expression) {
                 //verification(BigInt(a-b));
                 stack.push(convertir_binaire_en_decimal(soustraction_binaire(a, b)));
             } else if (token === "*") {
-               //verification(BigInt(a*b));
+               // verification(BigInt(a*b));
                 stack.push(convertir_binaire_en_decimal(multiplication_binaire(a, b)));
             } else if (token === "/") {
                 stack.push(convertir_binaire_en_decimal(division_binaire(a, b)));
@@ -66,29 +66,6 @@ function analyserNombre(nombreStr) {
     const [entierPart, decimalPart = '0'] = nombreStr.replace('-', '').split('.');
     return [signe, entierPart || '0', decimalPart];
 }
-function verification(nombre1,nombre2 =1) {
-    const nbremaxentier = 2n ** 63n
-    let [signe, entier1, decimal1] = analyserNombre(nombre1.toString());
-    entier1 = BigInt(entier1);
-    console.log(entier1)
-    console.log(nbremaxentier)
-    if (BigInt(entier1) > nbremaxentier){
-        throw new Error("Le nombre dépasse la limite de 63 bits");
-      }
-      
-      // verification decimal
-     /* const nbremaxdecimal = Math.pow(2, -64).toFixed(50).toString(); // plus petit nombre decimal sur 64 bits => 0.00000000000000000005421010862427522170037264004350
-      let [x,y] = nbremaxdecimal.split('.')
-      reference_decimal = y //.replace(/^0+/, "") || "0"; // valeur de reference pour comparaison => 00000000000000000005421010862427522170037264004350
-      console.log("decimal : " + decimal1.length)
-      console.log("reference decimal " + reference_decimal.length)
-      if (decimal1.length > reference_decimal.length) {
-        throw new Error ("Le nombre dépasse la limite des 64 bits");
-      }
-      if (decimal1.length = reference_decimal.length && decimal1 > reference_decimal){
-        throw new Error ("Le nombre dépasse la limite des 64 bits");
-      } */
-}
 
 function decimal_en_binaire(decimalStr) {
     let decimal = parseFloat(`0.${decimalStr}`);
@@ -106,7 +83,10 @@ function decimal_en_binaire(decimalStr) {
     
     return bits.padEnd(64, '0');
 }
-//console.log("-1.25 :" + convertir_en_binaire(-1.25))
+//console.log("-1.25 :" + convertir_en_binaire(-1.25));
+//console.log("analyser : -1.25 :" + analyserNombre("-1.25"));
+//console.log("analyser : 58:" + analyserNombre("58"));
+//console.log("decimal_en_binair : 25 :" + decimal_en_binaire("25")); 01000000....
 
 function convertir_binaire_en_decimal(binaire) {
     let [signe, partie_entiere, partie_decimale] = binaire.split('.');
@@ -124,31 +104,48 @@ function convertir_binaire_en_decimal(binaire) {
 }
 //console.log("-2,2.200785525 * : " + convertir_binaire_en_decimal(multiplication_binaire(-2,2.200785525)) )
 
+function verification(nombre1, nombre2 = 1) {
+    const MAX_POSITIVE = 2n ** 63n - 1n;
+    const MAX_NEGATIVE = -(2n ** 63n);
+    const nbremaxdecimal = Math.pow(2, -64).toFixed(50).split('.')[1];
+
+    let [signe, entierStr, decimalStr] = analyserNombre(nombre1.toString());
+    const entier = BigInt(entierStr);
+
+    //entier positif et negatif verifiacation
+    if (signe === true && entier > -MAX_NEGATIVE) {
+        throw new Error("Le nombre dépasse la limite négative des 63 bits");
+    } else if (signe !== true && entier > MAX_POSITIVE) {
+        throw new Error("Le nombre dépasse la limite positive des 63 bits");
+    }
+    //console.log(MAX_POSITIVE)
+    //console.log(nbremaxdecimal) -> plus petit nombre decimal sur 64 bits => 0.00000000000000000005421010862427522170037264004350
+    if (decimalStr.length > nbremaxdecimal.length) {
+        throw new Error("Le nombre dpasse la limite des 64 bits décimaux");
+    } else if (decimalStr.length === nbremaxdecimal.length && decimalStr > nbremaxdecimal) {
+        throw new Error("Le nombre depasse la limite des 64 bits décimaux");
+    }
+}
+
+
 function addition_binaire(x, y) {
     let x_binaire = convertir_en_binaire(x);
     let y_binaire = convertir_en_binaire(y);
-
     let [signe_x, x_entier, x_decimal] = x_binaire.split('.');
     let [signe_y, y_entier, y_decimal] = y_binaire.split('.');
-
     let negatif_x = signe_x === '1';
     let negatif_y = signe_y === '1';
-
     if (negatif_x && !negatif_y) return soustraction_binaire(y, Math.abs(x));
     if (!negatif_x && negatif_y) return soustraction_binaire(x, Math.abs(y));
-
     let max_entier = Math.max(x_entier.length, y_entier.length);
     let max_decimal = Math.max(x_decimal.length, y_decimal.length);
-
     let x_entier_norm = x_entier.padStart(max_entier, '0');
     let y_entier_norm = y_entier.padStart(max_entier, '0');
     let x_decimal_norm = x_decimal.padEnd(max_decimal, '0');
     let y_decimal_norm = y_decimal.padEnd(max_decimal, '0');
-
     let retenue = 0;
     let resultat_decimal = '';
     let resultat_entier = '';
-
     for (let i = max_decimal - 1; i >= 0; i--) {
         let somme = parseInt(x_decimal_norm[i]) + parseInt(y_decimal_norm[i]) + retenue;
         resultat_decimal = (somme % 2) + resultat_decimal;
@@ -160,7 +157,6 @@ function addition_binaire(x, y) {
         resultat_entier = (somme % 2) + resultat_entier;
         retenue = Math.floor(somme / 2);
     }
-
     if (retenue === 1) {
         resultat_entier = '1' + resultat_entier;
     }
@@ -172,24 +168,18 @@ function addition_binaire(x, y) {
 function soustraction_binaire(x, y) {
     let x_binaire = convertir_en_binaire(x);
     let y_binaire = convertir_en_binaire(y);
-
     let [signe_x, x_entier, x_decimal] = x_binaire.split('.');
     let [signe_y, y_entier, y_decimal] = y_binaire.split('.');
-
     let negatif_x = signe_x === '1';
     let negatif_y = signe_y === '1';
-
     if (negatif_y) return addition_binaire(x, Math.abs(y));
     if (negatif_x) return `-${addition_binaire(Math.abs(x), y)}`;
-
     let max_entier = Math.max(x_entier.length, y_entier.length);
     let max_decimal = Math.max(x_decimal.length, y_decimal.length);
-
     let x_entier_norm = x_entier.padStart(max_entier, '0');
     let y_entier_norm = y_entier.padStart(max_entier, '0');
     let x_decimal_norm = x_decimal.padEnd(max_decimal, '0');
     let y_decimal_norm = y_decimal.padEnd(max_decimal, '0');
-
     let retenue = 0;
     let resultat_decimal = '';
     let resultat_entier = '';
@@ -204,10 +194,8 @@ function soustraction_binaire(x, y) {
         } else {
             retenue = 0;
         }
-
         resultat_decimal = (bit_x - bit_y) + resultat_decimal;
     }
-
     for (let i = max_entier - 1; i >= 0; i--) {
         let bit_x = parseInt(x_entier_norm[i]);
         let bit_y = parseInt(y_entier_norm[i]) + retenue;
@@ -218,10 +206,8 @@ function soustraction_binaire(x, y) {
         } else {
             retenue = 0;
         }
-
         resultat_entier = (bit_x - bit_y) + resultat_entier;
     }
-
     if (retenue === 1) {
         result_temporaire = `${soustraction_binaire(y, x)}`;
         let [signe_temp, temp_entier, temp_decimal] = result_temporaire.split('.');
@@ -324,7 +310,7 @@ console.log (typeof(m))
  console.log("Y " + y); */
  console.log (Math.pow(-2, 9))
  console.log (Math.pow(2, -9))
- console.log((Math.pow(-2, 62)) + (1 - Math.pow(2, -9)));
+ console.log((Math.pow(2, 62)));
  console.log ((1 - Math.pow(2, -9)) > Math.pow(2, -9) )
 
  console.log(Math.pow (-2, 62) )

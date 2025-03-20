@@ -23,7 +23,7 @@
       link.addEventListener('mouseenter', function() {
           let content = {
               info1: "Ce projet a été réalisé par AGBINKO Emmanuel et PINEAU Bertille sous la supervision de Jean Michel Richer.",
-              info2: "<p>Représentation en virgule fixe suivant un format de 128 bits.</p><img src='1.png' alt='format de représentation'><p>Nous pouvons représenter des valeurs de -2 PUISSANCE 62 + (1 - 2 PUISSANCE -64) à 2 puissance 63 + (1 - 2 puissance 64)</p>",
+              info2: "<p>Représentation en virgule fixe suivant un format de 128 bits.</p><img src='1.png' alt='format de représentation'><p>Nous pouvons représenter des valeurs dans la plage de [ -9.22×10¹⁸ , +9.22×10¹⁸ ] avec une précision déciamle allant jusqu'à 2⁻⁶⁴ ≈ 5.42 × 10⁻²⁰</p>",
               info3: "<p>78 197 + 45 * 1000 / = 12.375 </br> </br> 12.14 -15.24 + 8975 * 74.157848 / = -375.17944156092557 </br> </br> 999999999999999999 100000000000000001 + = 1100000000000000000.</p>"
           };
           let infoKey = this.getAttribute('data-info');
@@ -45,7 +45,7 @@
 </script>
   <div class="container">
     <h1>Représentation des grands nombres réels</h1>
-    <p>On représente les nombres entre ... et ...</p>
+    <p>Valeur min : -9,223,372,036,854,775,807.99999999999999999994 <br><br> Valeur max : +9,223,372,036,854,775,807.99999999999999999994</p>
     <p>Calculs en notation polonaise inversée (nombre1 nombre2 opérateur)</p>
     <p> Les opérations possibles : addition, soustraction, multiplication, division</p>
     <input id="expression" type="text" placeholder="Ex: 14.17 1875.09 + 195 -">
