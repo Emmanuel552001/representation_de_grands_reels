@@ -243,10 +243,4 @@ document.getElementById("calculateBtn").addEventListener("click", () => {
   646651651616465.241411654 16416165161616.156165156161 +
 
   2 4 - => dépassement de capacité en soustraction (underflow)
-  -2 4 + => -6 au lieu de 2
-  2 -2 + => 4 au lieu de 0
-  -2 -2 - => -4
-  -2 2 - => 0
-  2 2 * =>  0.00000000000000000043
-  7 11 - => Dépassement de capacité en soustraction (underflow)
-*/
+  -2 4 + => -6
