@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 * Convertir un nombre en binaire
     * Separer la partie entire de la partie decimal :  nombre.toString().split('.')
     * Convertir un entier en binaire
@@ -23,6 +24,8 @@
     * convertir les deux nombres en binaire avec convertir_n_binaire()
     * addition bit à bit  des parties decimale 
 =======
+=======
+>>>>>>> origin/main
 **evaluer_rpn(expression)**
 Début
   Initialiser une pile vide `stack`
@@ -105,4 +108,7 @@ Début
   Compléter `bits` avec des '0' pour atteindre 64 bits
   Retourner `bits`
 Fin
+<<<<<<< HEAD
+>>>>>>> origin/main
+=======
 >>>>>>> origin/main
