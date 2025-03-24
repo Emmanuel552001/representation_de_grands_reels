@@ -7,19 +7,70 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <nav class="menu">
+    <a href="" data-info="info1">Accueil</a>
+    <a href="" data-info="info2">Format de représentation</a>
+    <a href="" data-info="info3">Exemples</a>
+</nav>
+<div id="rideau" class="rideau">
+  <div class="rideau-content" id="rideau-content"></div>
+</div>
+<script>
+  let rideau = document.getElementById('rideau');
+  let rideauContent = document.getElementById('rideau-content');
+  
+  document.querySelectorAll('.menu a').forEach(link => {
+      link.addEventListener('mouseenter', function() {
+          let content = {
+              info1: "Ce projet a été réalisé par AGBINKO Emmanuel et PINEAU Bertille sous la supervision de Jean Michel Richer.",
+              info2: "<p>Représentation en virgule fixe suivant un format de 128 bits.</p><img src='1.png' alt='format de représentation'><p>Nous pouvons représenter des valeurs dans la plage de [ -9.22×10¹⁸ , +9.22×10¹⁸ ] avec une précision déciamle allant jusqu'à 2⁻⁶⁴ ≈ 5.42 × 10⁻²⁰</p>",
+              info3: "<p>78 197 + 45 * 1000 / = 12.375 </br> </br> 12.14 -15.24 + 8975 * 74.157848 / = -375.17944156092557 </br> </br> 999999999999999999 100000000000000001 + = 1100000000000000000.</p>"
+          };
+          let infoKey = this.getAttribute('data-info');
+          rideauContent.innerHTML = content[infoKey] || "Aucune information disponible.";
+          rideau.style.height = '1000px';
+      });
+      link.addEventListener('mouseleave', function() {
+          setTimeout(() => {
+              if (!rideau.matches(':hover')) {
+                  rideau.style.height = '0';
+              }
+          }, 300);
+      });
+  });
+  
+  rideau.addEventListener('mouseleave', function() {
+      rideau.style.height = '0';
+  });
+</script>
   <div class="container">
     <h1>Représentation des grands nombres réels</h1>
+<<<<<<< HEAD
     <input id="expression" type="text" placeholder="Ex: 14.17 + 1875.09 - 195">
     <button id="calculateButton">Calculer</button>
+=======
+    <p>Valeur min : -9,223,372,036,854,775,807.99999999999999999994 <br><br> Valeur max : +9,223,372,036,854,775,807.99999999999999999994</p>
+    <p>Calculs en notation polonaise inversée (nombre1 nombre2 opérateur)</p>
+    <p> Les opérations possibles : addition, soustraction, multiplication, division</p>
+    <input id="expression" type="text" placeholder="Ex: 14.17 1875.09 + 195 -">
+    <button id="calculateBtn">Calculer</button>
+
+>>>>>>> origin/main
     <div class="binary-display">
       <h2>Conversion Binaire :</h2>
       <pre id="binaryDisplay"></pre>
     </div>
+
     <div class="result">
       <h2>Résultat :</h2>
       <p id="result"></p>
     </div>
   </div>
+<<<<<<< HEAD
   <script src="binaire_function.js"></script>
+=======
+
+  <script src="script.js"></script>
+>>>>>>> origin/main
 </body>
 </html>
